@@ -1,0 +1,111 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>APITEST</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+      <script src="bootstrap/js/jquery-1.10.1.js"></script>
+  </head>
+  <body>
+    <div id="layout" style="width: 70%;margin: auto;">
+	<form class="form-horizontal">
+		<h2 style="text-align: center;">GET和POST在线测试</h2>
+        <div class="control-group">
+          <div class="controls">
+            <select style="width: 100px;" id="method" >
+            	<option value="post">POST</option>
+            	<option value="get">GET</option>
+            </select>
+          </div>
+        </div>
+		
+        <div class="form-group">
+          <div class="controls">
+          	<label >接口地址(如:http://www.abc.com/api/login)</label>
+            <input type="text" id="url"  placeholder="接口地址" class="form-control" style="width:100%">
+          </div>
+        </div><br />
+		
+        <div class="control-group">
+          <div class="controls">
+          	<label >参数(如：user_id=121&age=23&date=2016-08-23)</label>
+            <input type="text" id="params" placeholder="参数" style="width:100%">
+          </div>
+        </div>
+        <div class="control-group">
+          <div class="controls">
+            <button type="button" class="btn btn-primary" id="http-submit">提交</button>
+            <button type="reset"  class="btn btn-link" >清除</button>
+          </div>
+        </div>
+        <div class="control-group">
+          <div class="controls">
+          	<label >返回结果</label>
+			<textarea style="width: 100%;height: 300px;" id="http-response"></textarea>
+          </div>
+        </div>
+      </form>
+</div>
+	
+	<script>
+			$(function () {
+		//格式化json数据
+		function dump(arr,level) { 
+			 var dumped_text = ""; 
+			 if(!level) level = 0; 
+			 
+			 //The padding given at the beginning of the line. 
+			 var level_padding = ""; 
+			 for(var j=0;j<level+1;j++) level_padding += "     "; 
+			 if(typeof(arr) == 'object') { //Array/Hashes/Objects 
+			 	 var i=0;
+				 for(var item in arr) { 
+					 var value = arr[item]; 
+					 if(typeof(value) == 'object') { //If it is an array, 
+						 dumped_text += level_padding + "\"" + item + "\" : \{ \n"; 
+						 dumped_text += dump(value,level+1); 
+					 	 dumped_text +=level_padding +"\}";
+					 } else { 
+					 	dumped_text += level_padding + "\"" + item + "\" : \"" + value + "\""; 
+					 } 
+					 if(i<Object.getOwnPropertyNames(arr).length-1){
+					 	dumped_text+=", \n";
+					 }else{
+					 	dumped_text+=" \n";
+					 }
+					 i++;
+				 } 
+			 } else { //Stings/Chars/Numbers etc. 
+			 	dumped_text = "===>"+arr+"<===("+typeof(arr)+")"; 
+			 } 
+			 return dumped_text; 
+		} 
+		
+		$("#http-submit").on('click',function () {
+			$.post("ajaxHttpApi.php",{
+				url:$("#url").val(),
+				method:$("#method").val(),
+				params:$("#params").val()
+			},function (data) {
+				try{
+					var text="\{ \n"+dump(JSON.parse(data))+" \}";//整体加个大括号
+					$("#http-response").val(text);
+				}catch(e){
+					//非json数据直接显示
+					$("#http-response").val(data);
+				}
+			});
+		});
+	});
+		
+	</script>
+	
+	
+    <!-- Include all compiled plugins (below), or include individual files as needed -->
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+
+  </body>
+</html>
